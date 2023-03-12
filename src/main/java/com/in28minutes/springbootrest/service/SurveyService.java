@@ -47,4 +47,16 @@ public class SurveyService {
     return SURVEY_LIST;
   }
 
+  /**
+   * Returns a specific survey with the id passed as parameter.
+   *
+   * @return a survey
+   */
+  public SurveyDto getSurveyById(String id) {
+    return SURVEY_LIST.stream()
+        .filter(survey -> survey.getId().equalsIgnoreCase(id))
+        .findFirst()
+        .orElse(null);
+  }
+
 }
