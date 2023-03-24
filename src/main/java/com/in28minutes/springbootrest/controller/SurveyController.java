@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -91,14 +92,7 @@ public class SurveyController {
       @PathVariable("survey_id") String surveyId,
       @PathVariable("question_id") String questionId) {
 
-    QuestionDto questionFound = surveyService.getQuestionByIdFromSurveyById(surveyId, questionId);
-    if (questionFound == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-          String.format("Question not found for survey id [%s] and question id [%s]",
-              surveyId, questionId));
-    }
-
-    return questionFound;
+    return surveyService.getQuestionByIdFromSurveyById(surveyId, questionId);
   }
 
   /**
@@ -139,15 +133,44 @@ public class SurveyController {
       @PathVariable("question_id") String questionId) {
 
     String deletedQuestionId = surveyService.deleteQuestionByIdFromSurveyById(surveyId, questionId);
-    if (deletedQuestionId == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-          String.format("Question not found for survey id [%s] and question id [%s]",
-              surveyId, questionId));
-    }
+
+    checkQuestionNotFound(deletedQuestionId, surveyId, questionId);
 
     return ResponseEntity
         .noContent()
         .build();
+  }
+
+  /**
+   * Basic endpoint to add a new question to a specific survey.
+   *
+   * @param surveyId the survey id to find.
+   * @param question the new question to add.
+   */
+  @PutMapping("/surveys/{survey_id}/questions/{question_id}")
+  public ResponseEntity<Object> updateSurveyQuestion(
+      @PathVariable("survey_id") String surveyId,
+      @PathVariable("question_id") String questionId,
+      @RequestBody QuestionDto question) {
+
+    String questionUpdated = surveyService.updateSurveyQuestionById(
+        surveyId, questionId, question);
+
+    checkQuestionNotFound(questionUpdated, surveyId, questionId);
+
+    return ResponseEntity
+        .noContent()
+        .build();
+  }
+
+  private void checkQuestionNotFound(
+      final String questionFound, final String surveyId, final String questionId) {
+
+    if (questionFound == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+          String.format("Question not found for survey id [%s] and question id [%s]",
+              surveyId, questionId));
+    }
   }
 
 }
