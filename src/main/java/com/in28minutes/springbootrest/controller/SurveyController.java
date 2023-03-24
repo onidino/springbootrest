@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -101,9 +102,10 @@ public class SurveyController {
   }
 
   /**
-   * Basic endpoint to obtain all the questions from a specific survey.
+   * Basic endpoint to add a new question to a specific survey.
    *
    * @param surveyId the survey id to find.
+   * @param question the new question to add.
    */
   @PostMapping("/surveys/{survey_id}/questions")
   public ResponseEntity<Object> addNewSurveyQuestion(
@@ -121,6 +123,30 @@ public class SurveyController {
 
     return ResponseEntity
         .created(locationHeader)
+        .build();
+  }
+
+  /**
+   * Basic endpoint to delete a specific question from a survey found by id.
+   *
+   * @param surveyId   the survey id to find.
+   * @param questionId the question to find and delete.
+   * @return the question id of the deleted question.
+   */
+  @DeleteMapping("/surveys/{survey_id}/question/{question_id}")
+  public ResponseEntity<Object> deleteQuestionByIdFromSurveyById(
+      @PathVariable("survey_id") String surveyId,
+      @PathVariable("question_id") String questionId) {
+
+    String deletedQuestionId = surveyService.deleteQuestionByIdFromSurveyById(surveyId, questionId);
+    if (deletedQuestionId == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+          String.format("Question not found for survey id [%s] and question id [%s]",
+              surveyId, questionId));
+    }
+
+    return ResponseEntity
+        .noContent()
         .build();
   }
 

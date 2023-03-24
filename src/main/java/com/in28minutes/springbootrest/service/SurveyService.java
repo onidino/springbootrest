@@ -124,4 +124,15 @@ public class SurveyService {
     return new BigInteger(32, new SecureRandom())
         .toString();
   }
+
+  public String deleteQuestionByIdFromSurveyById(
+      final String surveyId, final String questionId) {
+
+    List<QuestionDto> questionFromSurvey = getQuestionsFromSurveyById(surveyId);
+
+    boolean deletedQuestion = questionFromSurvey.removeIf(
+        questionDto -> questionDto.getId().equalsIgnoreCase(questionId));
+
+    return deletedQuestion ? questionId : null;
+  }
 }
