@@ -2,6 +2,8 @@ package com.in28minutes.springbootrest.service;
 
 import com.in28minutes.springbootrest.entity.QuestionDto;
 import com.in28minutes.springbootrest.entity.SurveyDto;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,7 +33,7 @@ public class SurveyService {
         Arrays.asList("Kubernetes", "Docker", "Terraform", "Azure DevOps"),
         "Kubernetes");
 
-    List<QuestionDto> questions = List.of(question1, question2, question3);
+    List<QuestionDto> questions = new ArrayList<>(List.of(question1, question2, question3));
 
     SurveyDto survey = new SurveyDto("Survey1", "My Favorite Survey",
         "Description of the Survey", questions);
@@ -102,4 +104,24 @@ public class SurveyService {
         .orElse(null);
   }
 
+  /**
+   * Method to add a new question to the specific survey found by id.
+   *
+   * @param surveyId the survey id to find the survey
+   * @param question the new question to add
+   */
+  public String addNewSurveyQuestion(
+      final String surveyId, final QuestionDto question) {
+
+    List<QuestionDto> questionsList = getQuestionsFromSurveyById(surveyId);
+    question.setId(generateRandomId());
+    questionsList.add(question);
+
+    return question.getId();
+  }
+
+  private String generateRandomId() {
+    return new BigInteger(32, new SecureRandom())
+        .toString();
+  }
 }
