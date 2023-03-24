@@ -3,12 +3,12 @@ package com.in28minutes.springbootrest.entity;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * Simple Question dto with description of the question and the correct answer.
  */
-@Getter
+@Data
 public class QuestionDto {
 
   private String id;

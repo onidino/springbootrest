@@ -3,13 +3,18 @@ package com.in28minutes.springbootrest.controller;
 import com.in28minutes.springbootrest.entity.QuestionDto;
 import com.in28minutes.springbootrest.entity.SurveyDto;
 import com.in28minutes.springbootrest.service.SurveyService;
+import java.net.URI;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * Controller class to manage the CRUD operations of the surveys.
@@ -29,7 +34,7 @@ public class SurveyController {
    *
    * @return list of surveys
    */
-  @RequestMapping("/surveys")
+  @GetMapping("/surveys")
   public List<SurveyDto> getAllSurveys() {
 
     return this.surveyService.getAllSurveys();
@@ -41,7 +46,7 @@ public class SurveyController {
    * @param surveyId the servey id to find.
    * @return the survey with the given id.
    */
-  @RequestMapping("/surveys/{id}")
+  @GetMapping("/surveys/{id}")
   public SurveyDto getSurveyById(
       @PathVariable("id") String surveyId) {
 
@@ -60,9 +65,10 @@ public class SurveyController {
    * @param surveyId the survey id to find.
    * @return the survey with the given id.
    */
-  @RequestMapping("/surveys/{survey_id}/questions")
+  @GetMapping("/surveys/{survey_id}/questions")
   public List<QuestionDto> getQuestionsFromSurveyById(
       @PathVariable("survey_id") String surveyId) {
+
     List<QuestionDto> questionsList = surveyService.getQuestionsFromSurveyById(surveyId);
     if (questionsList.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -79,7 +85,7 @@ public class SurveyController {
    * @param questionId the question to find by id in the survey.
    * @return the survey with the given id.
    */
-  @RequestMapping("/surveys/{survey_id}/question/{question_id}")
+  @GetMapping("/surveys/{survey_id}/question/{question_id}")
   public QuestionDto getQuestionFromSurveyById(
       @PathVariable("survey_id") String surveyId,
       @PathVariable("question_id") String questionId) {
@@ -92,6 +98,30 @@ public class SurveyController {
     }
 
     return questionFound;
+  }
+
+  /**
+   * Basic endpoint to obtain all the questions from a specific survey.
+   *
+   * @param surveyId the survey id to find.
+   */
+  @PostMapping("/surveys/{survey_id}/questions")
+  public ResponseEntity<Object> addNewSurveyQuestion(
+      @PathVariable("survey_id") String surveyId,
+      @RequestBody QuestionDto question) {
+
+    String questionId = surveyService.addNewSurveyQuestion(surveyId, question);
+
+    // Adds location as a header in the response.
+    URI locationHeader = ServletUriComponentsBuilder
+        .fromCurrentRequest()
+        .path("/{questionId}")
+        .buildAndExpand(questionId)
+        .toUri();
+
+    return ResponseEntity
+        .created(locationHeader)
+        .build();
   }
 
 }
