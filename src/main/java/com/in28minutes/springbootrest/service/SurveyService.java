@@ -60,7 +60,7 @@ public class SurveyService {
       final String id) {
 
     return SURVEY_LIST.stream()
-        .filter(survey -> survey.getId().equalsIgnoreCase(id))
+        .filter(survey -> survey.getId().equals(id))
         .findFirst()
         .orElse(null);
   }
@@ -75,7 +75,7 @@ public class SurveyService {
       final String surveyId) {
 
     Optional<SurveyDto> surveyFound = SURVEY_LIST.stream()
-        .filter(survey -> survey.getId().equalsIgnoreCase(surveyId))
+        .filter(survey -> survey.getId().equals(surveyId))
         .findFirst();
     if (surveyFound.isPresent()) {
       return surveyFound.get().getQuestions();
@@ -95,11 +95,11 @@ public class SurveyService {
       final String surveyId, final String questionId) {
 
     Optional<SurveyDto> surveyFound = SURVEY_LIST.stream()
-        .filter(survey -> survey.getId().equalsIgnoreCase(surveyId))
+        .filter(survey -> survey.getId().equals(surveyId))
         .findFirst();
 
     return surveyFound.flatMap(surveyDto -> surveyDto.getQuestions().stream()
-            .filter(question -> question.getId().equalsIgnoreCase(questionId))
+            .filter(question -> question.getId().equals(questionId))
             .findFirst())
         .orElse(null);
   }
@@ -125,14 +125,41 @@ public class SurveyService {
         .toString();
   }
 
+  /**
+   * Delete question by id from a specific survey found by id
+   *
+   * @param surveyId   the survey id
+   * @param questionId the question id
+   * @return the question id of the deleted question.
+   */
   public String deleteQuestionByIdFromSurveyById(
       final String surveyId, final String questionId) {
 
     List<QuestionDto> questionFromSurvey = getQuestionsFromSurveyById(surveyId);
 
     boolean deletedQuestion = questionFromSurvey.removeIf(
-        questionDto -> questionDto.getId().equalsIgnoreCase(questionId));
+        questionDto -> questionDto.getId().equals(questionId));
 
     return deletedQuestion ? questionId : null;
+  }
+
+  /**
+   * Method to update an existing question from a specific survey found by id.
+   *
+   * @param surveyId   the survey id to find the survey
+   * @param questionId the question id from the survey
+   * @param question   the new question to add
+   */
+  public String updateSurveyQuestionById(
+      final String surveyId, final String questionId, final QuestionDto question) {
+
+    List<QuestionDto> questionsList = getQuestionsFromSurveyById(surveyId);
+    boolean questionDeleted = questionsList.removeIf(
+        questionToDelete -> questionToDelete.getId().equals(questionId));
+    if (questionDeleted) {
+      questionsList.add(question);
+      return questionId;
+    }
+    return null;
   }
 }
