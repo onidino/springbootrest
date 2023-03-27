@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -105,6 +106,17 @@ class SurveyControllerIT {
   }
 
   @Test
+  void getSurveyById_NotFound() {
+    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
+        String.format(URL_SURVEY, "NotFound"), String.class);
+
+    // assert
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    Assertions.assertEquals("application/json",
+        Objects.requireNonNull(responseEntity.getHeaders().get(HttpHeaders.CONTENT_TYPE)).get(0));
+  }
+
+  @Test
   void getQuestionsFromSurveyById_OK() throws JsonProcessingException {
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
         String.format(URL_SURVEY_ALL_QUESTIONS, "Survey1"), String.class);
@@ -121,6 +133,17 @@ class SurveyControllerIT {
     Assertions.assertEquals("Question1", expectedResponseList.get(0).getId());
     Assertions.assertEquals("Question2", expectedResponseList.get(1).getId());
     Assertions.assertEquals("Question3", expectedResponseList.get(2).getId());
+  }
+
+  @Test
+  void getQuestionsFromSurveyById_NotFound() {
+    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
+        String.format(URL_SURVEY_ALL_QUESTIONS, "NotFound"), String.class);
+
+    // assert
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    Assertions.assertEquals("application/json",
+        Objects.requireNonNull(responseEntity.getHeaders().get(HttpHeaders.CONTENT_TYPE)).get(0));
   }
 
   @Test
@@ -149,4 +172,14 @@ class SurveyControllerIT {
     JSONAssert.assertEquals(expectedResponse, responseEntity.getBody(), true);
   }
 
+  @Test
+  void getQuestionFromSurveyById_NotFound() {
+    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
+        String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"), String.class);
+
+    // assert
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    Assertions.assertEquals("application/json",
+        Objects.requireNonNull(responseEntity.getHeaders().get(HttpHeaders.CONTENT_TYPE)).get(0));
+  }
 }

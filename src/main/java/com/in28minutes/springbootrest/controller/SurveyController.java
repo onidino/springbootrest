@@ -92,7 +92,11 @@ public class SurveyController {
       @PathVariable("survey_id") String surveyId,
       @PathVariable("question_id") String questionId) {
 
-    return surveyService.getQuestionByIdFromSurveyById(surveyId, questionId);
+    QuestionDto questionFound = surveyService.getQuestionByIdFromSurveyById(surveyId, questionId);
+    String questionIdFound = questionFound != null ? questionFound.getId() : null;
+    checkQuestionNotFound(questionIdFound, surveyId, questionId);
+
+    return questionFound;
   }
 
   /**
