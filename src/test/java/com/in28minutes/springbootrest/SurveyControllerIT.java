@@ -22,9 +22,9 @@ import org.springframework.http.ResponseEntity;
 class SurveyControllerIT {
 
   private static final String URL_ALL_SURVEYS = "/surveys";
-  private static final String URL_SURVEY = "/surveys/Survey1";
-  private static final String URL_SURVEY_ALL_QUESTIONS = "/surveys/Survey1/questions";
-  private static final String URL_SURVEY_QUESTION = "/surveys/Survey1/question/Question1";
+  private static final String URL_SURVEY = "/surveys/%s";
+  private static final String URL_SURVEY_ALL_QUESTIONS = "/surveys/%s/questions";
+  private static final String URL_SURVEY_QUESTION = "/surveys/%s/question/%s";
 
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -95,7 +95,7 @@ class SurveyControllerIT {
         """;
 
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        URL_SURVEY, String.class);
+        String.format(URL_SURVEY, "Survey1"), String.class);
 
     // assert
     Assertions.assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
@@ -107,7 +107,7 @@ class SurveyControllerIT {
   @Test
   void getQuestionsFromSurveyById_OK() throws JsonProcessingException {
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        URL_SURVEY_ALL_QUESTIONS, String.class);
+        String.format(URL_SURVEY_ALL_QUESTIONS, "Survey1"), String.class);
 
     List<QuestionDto> expectedResponseList = Arrays.asList(
         jsonMapper.readValue(responseEntity.getBody(), QuestionDto[].class));
@@ -140,7 +140,7 @@ class SurveyControllerIT {
         """;
 
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        URL_SURVEY_QUESTION, String.class);
+        String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"), String.class);
 
     // assert
     Assertions.assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
