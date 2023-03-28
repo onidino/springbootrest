@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Objects;
 import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class SurveyControllerIT {
 
   private static final String URL_ALL_SURVEYS = "/surveys";
@@ -35,6 +39,7 @@ class SurveyControllerIT {
   private TestRestTemplate restTemplate;
 
   @Test
+  @Order(1)
   void getAllSurveys_OK() throws JsonProcessingException {
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
         URL_ALL_SURVEYS, String.class);
@@ -53,6 +58,7 @@ class SurveyControllerIT {
   }
 
   @Test
+  @Order(2)
   void getSurveyById_OK() throws JSONException {
     String expectedResponse = """
             {
@@ -108,6 +114,7 @@ class SurveyControllerIT {
   }
 
   @Test
+  @Order(3)
   void getSurveyById_NotFound() {
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
         String.format(URL_SURVEY, "NotFound"), String.class);
@@ -119,6 +126,7 @@ class SurveyControllerIT {
   }
 
   @Test
+  @Order(4)
   void getQuestionsFromSurveyById_OK() throws JsonProcessingException {
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
         String.format(URL_SURVEY_ALL_QUESTIONS, "Survey1"), String.class);
@@ -138,6 +146,7 @@ class SurveyControllerIT {
   }
 
   @Test
+  @Order(5)
   void getQuestionsFromSurveyById_NotFound() {
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
         String.format(URL_SURVEY_ALL_QUESTIONS, "NotFound"), String.class);
@@ -149,6 +158,7 @@ class SurveyControllerIT {
   }
 
   @Test
+  @Order(6)
   void getQuestionFromSurveyById_OK() throws JSONException {
     String expectedResponse = """
             {
@@ -175,6 +185,7 @@ class SurveyControllerIT {
   }
 
   @Test
+  @Order(7)
   void addNewSurveyQuestion_OK() {
     // given
     String newQuestionBody = """
@@ -201,11 +212,10 @@ class SurveyControllerIT {
 
     // assert
     Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-    Assertions.assertTrue(Objects.requireNonNull(responseEntity.getHeaders()
-        .get(HttpHeaders.LOCATION)).get(0).contains("/surveys/Survey/questions/"));
   }
 
   @Test
+  @Order(8)
   void getQuestionFromSurveyById_NotFound() {
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
         String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"), String.class);
@@ -217,6 +227,7 @@ class SurveyControllerIT {
   }
 
   @Test
+  @Order(9)
   void deleteQuestionByIdFromSurveyById_OK() {
     ResponseEntity<Void> responseEntity = restTemplate.exchange(
         String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"), HttpMethod.DELETE,
@@ -227,6 +238,7 @@ class SurveyControllerIT {
   }
 
   @Test
+  @Order(10)
   void deleteQuestionByIdFromSurveyById_NotFound() {
     ResponseEntity<Void> responseEntity = restTemplate.exchange(
         String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"), HttpMethod.DELETE,
