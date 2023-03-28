@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -173,6 +175,37 @@ class SurveyControllerIT {
   }
 
   @Test
+  void addNewSurveyQuestion_OK() {
+    // given
+    String newQuestionBody = """
+        {
+            "description": "Your Favorite Cloud Platform",
+            "options": [
+                "AWS",
+                "Azure",
+                "Google Cloud",
+                "Oracle Cloud"
+            ],
+            "correctAnswer": "Google Cloud"
+        }
+        """;
+
+    HttpHeaders httpHeaders = new HttpHeaders();
+    httpHeaders.add("Content-Type", "application/json");
+    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, httpHeaders);
+
+    // then
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_ALL_QUESTIONS, "Survey"), HttpMethod.POST,
+        requestEntity, String.class);
+
+    // assert
+    Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+    Assertions.assertTrue(Objects.requireNonNull(responseEntity.getHeaders()
+        .get(HttpHeaders.LOCATION)).get(0).contains("/surveys/Survey/questions/"));
+  }
+
+  @Test
   void getQuestionFromSurveyById_NotFound() {
     ResponseEntity<String> responseEntity = restTemplate.getForEntity(
         String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"), String.class);
@@ -181,5 +214,25 @@ class SurveyControllerIT {
     Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     Assertions.assertEquals("application/json",
         Objects.requireNonNull(responseEntity.getHeaders().get(HttpHeaders.CONTENT_TYPE)).get(0));
+  }
+
+  @Test
+  void deleteQuestionByIdFromSurveyById_OK() {
+    ResponseEntity<Void> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"), HttpMethod.DELETE,
+        null, Void.class);
+
+    // assert
+    Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+  }
+
+  @Test
+  void deleteQuestionByIdFromSurveyById_NotFound() {
+    ResponseEntity<Void> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"), HttpMethod.DELETE,
+        null, Void.class);
+
+    // assert
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
   }
 }

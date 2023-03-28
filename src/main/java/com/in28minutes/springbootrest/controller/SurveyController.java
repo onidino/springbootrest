@@ -141,7 +141,7 @@ public class SurveyController {
     checkQuestionNotFound(deletedQuestionId, surveyId, questionId);
 
     return ResponseEntity
-        .noContent()
+        .ok()
         .build();
   }
 
@@ -163,7 +163,7 @@ public class SurveyController {
     checkQuestionNotFound(questionUpdated, surveyId, questionId);
 
     return ResponseEntity
-        .noContent()
+        .ok()
         .build();
   }
 
