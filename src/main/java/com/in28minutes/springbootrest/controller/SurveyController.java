@@ -151,7 +151,7 @@ public class SurveyController {
    * @param surveyId the survey id to find.
    * @param question the new question to add.
    */
-  @PutMapping("/surveys/{survey_id}/questions/{question_id}")
+  @PutMapping("/surveys/{survey_id}/question/{question_id}")
   public ResponseEntity<Object> updateSurveyQuestion(
       @PathVariable("survey_id") String surveyId,
       @PathVariable("question_id") String questionId,
