@@ -351,4 +351,5 @@ class SurveyControllerTest {
     Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), mvcResult.getResponse().getStatus());
     Assertions.assertEquals("", mvcResult.getResponse().getContentAsString());
   }
+
 }

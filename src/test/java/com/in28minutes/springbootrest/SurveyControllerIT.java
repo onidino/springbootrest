@@ -207,7 +207,8 @@ class SurveyControllerIT {
 
     // then
     ResponseEntity<String> responseEntity = restTemplate.exchange(
-        String.format(URL_SURVEY_ALL_QUESTIONS, "Survey"), HttpMethod.POST,
+        String.format(URL_SURVEY_ALL_QUESTIONS, "Survey"),
+        HttpMethod.POST,
         requestEntity, String.class);
 
     // assert
@@ -228,10 +229,31 @@ class SurveyControllerIT {
 
   @Test
   @Order(9)
-  void deleteQuestionByIdFromSurveyById_OK() {
-    ResponseEntity<Void> responseEntity = restTemplate.exchange(
-        String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"), HttpMethod.DELETE,
-        null, Void.class);
+  void updateSurveyQuestion_OK() {
+    // given
+    String newQuestionBody = """
+        {
+            "id": "Question1",
+            "description": "Updated description",
+            "options": [
+                "AWS",
+                "Azure",
+                "Google Cloud",
+                "Oracle Cloud"
+            ],
+            "correctAnswer": "Google Cloud"
+        }
+        """;
+
+    HttpHeaders httpHeaders = new HttpHeaders();
+    httpHeaders.add("Content-Type", "application/json");
+    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, httpHeaders);
+
+    // then
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"),
+        HttpMethod.PUT,
+        requestEntity, String.class);
 
     // assert
     Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -239,12 +261,26 @@ class SurveyControllerIT {
 
   @Test
   @Order(10)
+  void deleteQuestionByIdFromSurveyById_OK() {
+    ResponseEntity<Void> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"),
+        HttpMethod.DELETE,
+        null, Void.class);
+
+    // assert
+    Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+  }
+
+  @Test
+  @Order(11)
   void deleteQuestionByIdFromSurveyById_NotFound() {
     ResponseEntity<Void> responseEntity = restTemplate.exchange(
-        String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"), HttpMethod.DELETE,
+        String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"),
+        HttpMethod.DELETE,
         null, Void.class);
 
     // assert
     Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
   }
+
 }
