@@ -81,7 +81,7 @@ public class SurveyService {
       return surveyFound.get().getQuestions();
     }
 
-    return Collections.emptyList();
+    return new ArrayList<>();
   }
 
   /**

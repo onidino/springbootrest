@@ -92,7 +92,11 @@ public class SurveyController {
       @PathVariable("survey_id") String surveyId,
       @PathVariable("question_id") String questionId) {
 
-    return surveyService.getQuestionByIdFromSurveyById(surveyId, questionId);
+    QuestionDto questionFound = surveyService.getQuestionByIdFromSurveyById(surveyId, questionId);
+    String questionIdFound = questionFound != null ? questionFound.getId() : null;
+    checkQuestionNotFound(questionIdFound, surveyId, questionId);
+
+    return questionFound;
   }
 
   /**
@@ -147,7 +151,7 @@ public class SurveyController {
    * @param surveyId the survey id to find.
    * @param question the new question to add.
    */
-  @PutMapping("/surveys/{survey_id}/questions/{question_id}")
+  @PutMapping("/surveys/{survey_id}/question/{question_id}")
   public ResponseEntity<Object> updateSurveyQuestion(
       @PathVariable("survey_id") String surveyId,
       @PathVariable("question_id") String questionId,
