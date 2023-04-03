@@ -261,6 +261,28 @@ class SurveyControllerIT {
 
   @Test
   @Order(10)
+  void updateSurveyQuestion_NotFound() {
+    // given
+    String newQuestionBody = """
+        {}
+        """;
+
+    HttpHeaders httpHeaders = new HttpHeaders();
+    httpHeaders.add("Content-Type", "application/json");
+    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, httpHeaders);
+
+    // then
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_QUESTION, "Survey1", "QuestionX"),
+        HttpMethod.PUT,
+        requestEntity, String.class);
+
+    // assert
+    Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+  }
+
+  @Test
+  @Order(11)
   void deleteQuestionByIdFromSurveyById_OK() {
     ResponseEntity<Void> responseEntity = restTemplate.exchange(
         String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"),
@@ -272,7 +294,7 @@ class SurveyControllerIT {
   }
 
   @Test
-  @Order(11)
+  @Order(12)
   void deleteQuestionByIdFromSurveyById_NotFound() {
     ResponseEntity<Void> responseEntity = restTemplate.exchange(
         String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"),
