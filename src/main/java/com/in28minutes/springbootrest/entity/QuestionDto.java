@@ -4,20 +4,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Simple Question dto with description of the question and the correct answer.
  */
 @Data
+@NoArgsConstructor
 public class QuestionDto {
 
   private String id;
   private String description;
   private List<String> options;
   private String correctAnswer;
-
-  public QuestionDto() {
-  }
 
   @JsonCreator
   public QuestionDto(

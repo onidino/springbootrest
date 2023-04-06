@@ -4,20 +4,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Simple Survey class with fields and lists of questions.
  */
 @Getter
+@NoArgsConstructor
 public class SurveyDto {
 
   private String id;
   private String title;
   private String description;
   private List<QuestionDto> questions;
-
-  public SurveyDto() {
-  }
 
   @JsonCreator
   public SurveyDto(
