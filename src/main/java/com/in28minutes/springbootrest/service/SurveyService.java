@@ -6,7 +6,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -32,8 +31,13 @@ public class SurveyService {
         "Question3", "Most Popular DevOps Tool",
         Arrays.asList("Kubernetes", "Docker", "Terraform", "Azure DevOps"),
         "Kubernetes");
+    QuestionDto question4 = new QuestionDto(
+        "QuestionForTest", "test",
+        Arrays.asList("test", "test", "test", "test"),
+        "test");
 
-    List<QuestionDto> questions = new ArrayList<>(List.of(question1, question2, question3));
+    List<QuestionDto> questions = new ArrayList<>(
+        List.of(question1, question2, question3, question4));
 
     SurveyDto survey = new SurveyDto("Survey1", "My Favorite Survey",
         "Description of the Survey", questions);
