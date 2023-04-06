@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.in28minutes.springbootrest.entity.QuestionDto;
 import com.in28minutes.springbootrest.entity.SurveyDto;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import org.json.JSONException;
@@ -33,7 +34,13 @@ class SurveyControllerIT {
   private static final String URL_SURVEY_ALL_QUESTIONS = "/surveys/%s/questions";
   private static final String URL_SURVEY_QUESTION = "/surveys/%s/question/%s";
 
+  private static final String AUTH_USER = "admin";
+
+  private static final String AUTH_PASSWORD = "password";
+
   private final ObjectMapper jsonMapper = new ObjectMapper();
+
+  private HttpEntity<String> requestEntity;
 
   @Autowired
   private TestRestTemplate restTemplate;
@@ -41,8 +48,12 @@ class SurveyControllerIT {
   @Test
   @Order(1)
   void getAllSurveys_OK() throws JsonProcessingException {
-    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        URL_ALL_SURVEYS, String.class);
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        URL_ALL_SURVEYS,
+        HttpMethod.GET,
+        requestEntity, String.class);
 
     List<SurveyDto> expectedResponseList = Arrays.asList(
         jsonMapper.readValue(responseEntity.getBody(), SurveyDto[].class));
@@ -103,8 +114,12 @@ class SurveyControllerIT {
              }
         """;
 
-    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        String.format(URL_SURVEY, "Survey1"), String.class);
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY, "Survey1"),
+        HttpMethod.GET,
+        requestEntity, String.class);
 
     // assert
     Assertions.assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
@@ -116,8 +131,12 @@ class SurveyControllerIT {
   @Test
   @Order(3)
   void getSurveyById_NotFound() {
-    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        String.format(URL_SURVEY, "NotFound"), String.class);
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY, "NotFound"),
+        HttpMethod.GET,
+        requestEntity, String.class);
 
     // assert
     Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -128,8 +147,12 @@ class SurveyControllerIT {
   @Test
   @Order(4)
   void getQuestionsFromSurveyById_OK() throws JsonProcessingException {
-    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        String.format(URL_SURVEY_ALL_QUESTIONS, "Survey1"), String.class);
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_ALL_QUESTIONS, "Survey1"),
+        HttpMethod.GET,
+        requestEntity, String.class);
 
     List<QuestionDto> expectedResponseList = Arrays.asList(
         jsonMapper.readValue(responseEntity.getBody(), QuestionDto[].class));
@@ -148,8 +171,12 @@ class SurveyControllerIT {
   @Test
   @Order(5)
   void getQuestionsFromSurveyById_NotFound() {
-    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        String.format(URL_SURVEY_ALL_QUESTIONS, "NotFound"), String.class);
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_ALL_QUESTIONS, "NotFound"),
+        HttpMethod.GET,
+        requestEntity, String.class);
 
     // assert
     Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -174,8 +201,12 @@ class SurveyControllerIT {
             }
         """;
 
-    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"), String.class);
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"),
+        HttpMethod.GET,
+        requestEntity, String.class);
 
     // assert
     Assertions.assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
@@ -201,9 +232,7 @@ class SurveyControllerIT {
         }
         """;
 
-    HttpHeaders httpHeaders = new HttpHeaders();
-    httpHeaders.add("Content-Type", "application/json");
-    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, httpHeaders);
+    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, getHeadersWithAuth());
 
     // then
     ResponseEntity<String> responseEntity = restTemplate.exchange(
@@ -218,8 +247,12 @@ class SurveyControllerIT {
   @Test
   @Order(8)
   void getQuestionFromSurveyById_NotFound() {
-    ResponseEntity<String> responseEntity = restTemplate.getForEntity(
-        String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"), String.class);
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
+        String.format(URL_SURVEY_QUESTION, "Survey1", "NotFound"),
+        HttpMethod.GET,
+        requestEntity, String.class);
 
     // assert
     Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -245,9 +278,7 @@ class SurveyControllerIT {
         }
         """;
 
-    HttpHeaders httpHeaders = new HttpHeaders();
-    httpHeaders.add("Content-Type", "application/json");
-    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, httpHeaders);
+    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, getHeadersWithAuth());
 
     // then
     ResponseEntity<String> responseEntity = restTemplate.exchange(
@@ -267,9 +298,7 @@ class SurveyControllerIT {
         {}
         """;
 
-    HttpHeaders httpHeaders = new HttpHeaders();
-    httpHeaders.add("Content-Type", "application/json");
-    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, httpHeaders);
+    HttpEntity<String> requestEntity = new HttpEntity<>(newQuestionBody, getHeadersWithAuth());
 
     // then
     ResponseEntity<String> responseEntity = restTemplate.exchange(
@@ -284,10 +313,12 @@ class SurveyControllerIT {
   @Test
   @Order(11)
   void deleteQuestionByIdFromSurveyById_OK() {
-    ResponseEntity<Void> responseEntity = restTemplate.exchange(
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
         String.format(URL_SURVEY_QUESTION, "Survey1", "Question1"),
         HttpMethod.DELETE,
-        null, Void.class);
+        requestEntity, String.class);
 
     // assert
     Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -296,13 +327,29 @@ class SurveyControllerIT {
   @Test
   @Order(12)
   void deleteQuestionByIdFromSurveyById_NotFound() {
-    ResponseEntity<Void> responseEntity = restTemplate.exchange(
+    requestEntity = new HttpEntity<>(null, getHeadersWithAuth());
+
+    ResponseEntity<String> responseEntity = restTemplate.exchange(
         String.format(URL_SURVEY_QUESTION, "NotFound", "NotFound"),
-        HttpMethod.DELETE,
-        null, Void.class);
+        HttpMethod.GET,
+        requestEntity, String.class);
 
     // assert
     Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
   }
 
+  private String getAuthorizedCredentials() {
+
+    String credentials = AUTH_USER + ":" + AUTH_PASSWORD;
+    byte[] encoded = Base64.getEncoder().encode(credentials.getBytes());
+    return new String(encoded);
+  }
+
+  private HttpHeaders getHeadersWithAuth() {
+
+    HttpHeaders httpHeaders = new HttpHeaders();
+    httpHeaders.add("Content-Type", "application/json");
+    httpHeaders.add("Authorization", "Basic " + getAuthorizedCredentials());
+    return httpHeaders;
+  }
 }
