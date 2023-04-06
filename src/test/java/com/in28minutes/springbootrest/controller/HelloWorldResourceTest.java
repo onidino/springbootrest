@@ -4,9 +4,11 @@ import com.in28minutes.springbootrest.entity.HelloWorldBeanDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 @WebMvcTest(controllers = HelloWorldResourceTest.class)
+@AutoConfigureMockMvc(addFilters = false)
 class HelloWorldResourceTest {
 
   private HelloWorldResource helloWorldResource;
